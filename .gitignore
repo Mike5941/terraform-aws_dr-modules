@@ -21,3 +21,5 @@ ovrride.tf.json
 #.terraform 디렉토리: Terraform 초기화 중 생성되는 프로바이더 플러그인들이 저장되는 곳입니다.
 .terraformrc
 terraform.rc
+
+.idea/
