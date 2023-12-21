@@ -38,10 +38,18 @@ resource "aws_route_table" "web_rt" {
   }
 
   dynamic "route" {
-    for_each = can(regex("(?i).*(Pri).*", each.key)) ? [1] : []
+    for_each = can(regex("(?i).*(Web-3).*", each.key)) && length(aws_nat_gateway.primary_ngw) > 0 ? [1] : []
     content {
-      cidr_block = "0.0.0.0/0"
-      gateway_id = aws_nat_gateway.primary_ngw.id
+      cidr_block     = "0.0.0.0/0"
+      nat_gateway_id = aws_nat_gateway.primary_ngw[0].id
+    }
+  }
+
+  dynamic "route" {
+    for_each = can(regex("(?i).*(Web-4).*", each.key)) && length(aws_nat_gateway.primary_ngw) > 1 ? [1] : []
+    content {
+      cidr_block     = "0.0.0.0/0"
+      nat_gateway_id = aws_nat_gateway.primary_ngw[1].id
     }
   }
 
@@ -74,3 +82,5 @@ resource "aws_nat_gateway" "primary_ngw" {
     Name = "${var.project_name}-ngw${count.index + 1}"
   }
 }
+
+
