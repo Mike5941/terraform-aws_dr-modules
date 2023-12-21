@@ -1,3 +1,4 @@
+
 resource "aws_vpc" "web_vpc" {
   cidr_block = var.vpc_cidr_block
   tags = {
@@ -12,7 +13,7 @@ resource "aws_internet_gateway" "web_igw" {
   }
 }
 
-resource "aws_subnet" "prod_subnet" {
+resource "aws_subnet" "primary" {
   for_each = var.subnets
 
   vpc_id                  = aws_vpc.web_vpc.id
@@ -29,7 +30,7 @@ resource "aws_route_table" "web_rt" {
   vpc_id   = aws_vpc.web_vpc.id
 
   dynamic "route" {
-    for_each = can(regex("(?i).*(Web-Pub).*", each.key)) ? [1] : []
+    for_each = can(regex("(?i).*(Pub).*", each.key)) ? [1] : []
     content {
       cidr_block = "0.0.0.0/0"
       gateway_id = aws_internet_gateway.web_igw.id
@@ -37,10 +38,10 @@ resource "aws_route_table" "web_rt" {
   }
 
   dynamic "route" {
-    for_each = can(regex("(?i).*(WEB-Pri).*", each.key)) ? [1] : []
+    for_each = can(regex("(?i).*(Pri).*", each.key)) ? [1] : []
     content {
       cidr_block = "0.0.0.0/0"
-      gateway_id = aws_nat_gateway.prod_nat_gateway.id
+      gateway_id = aws_nat_gateway.primary_ngw.id
     }
   }
 
@@ -49,23 +50,27 @@ resource "aws_route_table" "web_rt" {
   }
 }
 
-resource "aws_route_table_association" "web_subnet" {
-  for_each       = aws_subnet.prod_subnet
-  subnet_id      = aws_subnet.prod_subnet[each.key].id
+resource "aws_route_table_association" "sn_rt" {
+  for_each       = aws_subnet.primary
+  subnet_id      = aws_subnet.primary[each.key].id
   route_table_id = aws_route_table.web_rt[each.key].id
 }
 
-resource "aws_eip" "prod_nat_eip" {
+resource "aws_eip" "primary_eip" {
+  count = 2
+
   tags = {
-    Name = "${var.project_name}-eip"
+    Name = "${var.project_name}-eip${count.index + 1}"
   }
 }
 
-resource "aws_nat_gateway" "prod_nat_gateway" {
-  allocation_id = aws_eip.prod_nat_eip.id
-  subnet_id     = aws_subnet.prod_subnet["WEB-Pub-1"].id
+
+resource "aws_nat_gateway" "primary_ngw" {
+  count         = 2
+  allocation_id = aws_eip.primary_eip[count.index].id
+  subnet_id     = aws_subnet.primary["Pub-${count.index + 1}"].id
 
   tags = {
-    Name = "${var.project_name}-ngw"
+    Name = "${var.project_name}-ngw${count.index + 1}"
   }
 }
