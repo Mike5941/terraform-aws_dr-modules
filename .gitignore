@@ -22,4 +22,6 @@ ovrride.tf.json
 .terraformrc
 terraform.rc
 
+.terraform.lock.hcl
+
 .idea/
