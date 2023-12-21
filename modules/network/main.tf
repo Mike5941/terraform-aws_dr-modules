@@ -1,4 +1,3 @@
-
 resource "aws_vpc" "web_vpc" {
   cidr_block = var.vpc_cidr_block
   tags = {
@@ -26,11 +25,11 @@ resource "aws_subnet" "primary" {
 }
 
 resource "aws_route_table" "web_rt" {
-  for_each = var.subnets
+  for_each = aws_subnet.primary
   vpc_id   = aws_vpc.web_vpc.id
 
   dynamic "route" {
-    for_each = can(regex("(?i).*(Pub).*", each.key)) ? [1] : []
+    for_each = local.is_pub_subnet[each.key] ? [1] : []
     content {
       cidr_block = "0.0.0.0/0"
       gateway_id = aws_internet_gateway.web_igw.id
@@ -38,7 +37,7 @@ resource "aws_route_table" "web_rt" {
   }
 
   dynamic "route" {
-    for_each = can(regex("(?i).*(Web-3).*", each.key)) && length(aws_nat_gateway.primary_ngw) > 0 ? [1] : []
+    for_each = local.is_web3_subnet[each.key] ? [1] : []
     content {
       cidr_block     = "0.0.0.0/0"
       nat_gateway_id = aws_nat_gateway.primary_ngw[0].id
@@ -46,7 +45,7 @@ resource "aws_route_table" "web_rt" {
   }
 
   dynamic "route" {
-    for_each = can(regex("(?i).*(Web-4).*", each.key)) && length(aws_nat_gateway.primary_ngw) > 1 ? [1] : []
+    for_each = local.is_web4_subnet[each.key] ? [1] : []
     content {
       cidr_block     = "0.0.0.0/0"
       nat_gateway_id = aws_nat_gateway.primary_ngw[1].id
@@ -63,6 +62,7 @@ resource "aws_route_table_association" "sn_rt" {
   subnet_id      = aws_subnet.primary[each.key].id
   route_table_id = aws_route_table.web_rt[each.key].id
 }
+
 
 resource "aws_eip" "primary_eip" {
   count = 2
@@ -82,5 +82,22 @@ resource "aws_nat_gateway" "primary_ngw" {
     Name = "${var.project_name}-ngw${count.index + 1}"
   }
 }
+
+locals {
+  is_pub_subnet = { for k, _ in aws_subnet.primary : k => can(regex("(?i).*Pub.*", k)) }
+  is_web3_subnet = { for k, _ in aws_subnet.primary : k => can(regex("(?i).*Web-3.*", k)) }
+  is_web4_subnet = { for k, _ in aws_subnet.primary : k => can(regex("(?i).*Web-4.*", k)) }
+  is_db_subnet = { for k, _ in aws_subnet.primary : k => can(regex("(?i).*DB.*", k)) }
+
+  public_subnet_ids = { for k, v in aws_subnet.primary : k => v.id if can(regex("(?i).*Pub.*", k)) }
+  web_subnet_ids = { for k, v in aws_subnet.primary : k => v.id if can(regex("(?i).*Web.*", k)) }
+  db_subnet_ids = { for k, v in aws_subnet.primary : k => v.id if can(regex("(?i).*DB.*", k)) }
+}
+
+
+
+
+
+
 
 

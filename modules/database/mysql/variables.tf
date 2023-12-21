@@ -1,6 +1,6 @@
 variable "identifier_prefix" {
   type    = string
-  default = "terraform-up-and-running"
+  default = "main_zone"
 }
 
 variable "engine_type" {

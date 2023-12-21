@@ -11,6 +11,7 @@ resource "aws_db_instance" "example" {
   password = var.db_password
 }
 
+
 data "aws_vpc" "prod_vpc" {
   filter {
     name   = "tag:Name"
