@@ -9,7 +9,6 @@
      db_port     = data.terraform_remote_state.db.outputs.port
      server_text = var.server_text
    })
-
  }
 
  resource "aws_autoscaling_group" "example" {

@@ -83,15 +83,34 @@ resource "aws_nat_gateway" "primary_ngw" {
   }
 }
 
+resource "aws_db_subnet_group" "db_subnet_group" {
+  name       = "db-subnet-group"
+  subnet_ids = local.db_subnet_ids
+
+  tags = {
+    Name = "DB Subnet Group"
+  }
+}
+
+resource "aws_elasticache_subnet_group" "elasticache_subnet_group" {
+  name       = "elasticache-subnet-group"
+  subnet_ids = local.db_subnet_ids
+
+  tags = {
+    Name = "Elasticache Subnet Group"
+  }
+}
+
+
 locals {
   is_pub_subnet = { for k, _ in aws_subnet.primary : k => can(regex("(?i).*Pub.*", k)) }
   is_web3_subnet = { for k, _ in aws_subnet.primary : k => can(regex("(?i).*Web-3.*", k)) }
   is_web4_subnet = { for k, _ in aws_subnet.primary : k => can(regex("(?i).*Web-4.*", k)) }
   is_db_subnet = { for k, _ in aws_subnet.primary : k => can(regex("(?i).*DB.*", k)) }
 
-  public_subnet_ids = { for k, v in aws_subnet.primary : k => v.id if can(regex("(?i).*Pub.*", k)) }
-  web_subnet_ids = { for k, v in aws_subnet.primary : k => v.id if can(regex("(?i).*Web.*", k)) }
-  db_subnet_ids = { for k, v in aws_subnet.primary : k => v.id if can(regex("(?i).*DB.*", k)) }
+  public_subnet_ids = toset([for k, v in aws_subnet.primary : v.id if can(regex("(?i).*Pub.*", k))])
+  web_subnet_ids =  toset([for k, v in aws_subnet.primary : v.id if can(regex("(?i).*Web.*", k))])
+  db_subnet_ids = toset([for k, v in aws_subnet.primary : v.id if can(regex("(?i).*DB.*", k))])
 }
 
 

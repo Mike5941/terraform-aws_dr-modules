@@ -1,6 +1,11 @@
+variable "project_name" {
+  type = string
+  default = "WEB-Primary"
+}
+
 variable "identifier_prefix" {
   type    = string
-  default = "main_zone"
+
 }
 
 variable "engine_type" {
@@ -38,4 +43,11 @@ variable "db_password" {
 
 variable "db_subnet_group_name" {
   type = string
+}
+
+data "aws_vpc" "primary" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.project_name}-vpc"]
+  }
 }

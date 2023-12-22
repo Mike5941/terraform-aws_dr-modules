@@ -12,22 +12,11 @@ resource "aws_db_instance" "example" {
 }
 
 
-data "aws_vpc" "prod_vpc" {
-  filter {
-    name   = "tag:Name"
-    values = ["prod-sel-vpc"]
-  }
-}
-
-output "vpc_id" {
-  value = data.aws_vpc.prod_vpc.id
-}
-
 
 resource "aws_security_group" "rds_sg" {
   name        = "rds-security-group"
   description = "Security group for RDS instance"
-  vpc_id      = data.aws_vpc.prod_vpc.id
+  vpc_id      = data.aws_vpc.primary.id
   ingress {
     from_port   = 3306
     to_port     = 3306
