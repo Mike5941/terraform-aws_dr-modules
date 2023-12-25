@@ -14,18 +14,13 @@ provider "aws" {
   alias  = "tokyo"
 }
 
-provider "aws" {
-  region = "ap-northeast-2"
-  alias  = "seoul"
-}
-
-module "redundant_zone" {
+module "secondary_zone" {
   source = "../../../modules/network"
 
   providers = {
     aws = aws.tokyo
-
   }
+
   project_name   = "WEB-Secondary"
   vpc_cidr_block = "10.2.0.0/16"
   subnets = {

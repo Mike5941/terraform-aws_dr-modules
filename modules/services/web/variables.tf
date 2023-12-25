@@ -59,7 +59,6 @@ variable "instance_type" {
   description = "The type of EC2 Instances to run (e.g. t2.micro)"
   default     = "t2.micro"
 }
-
 locals {
   ssh_port    = 22
   http_port   = 80

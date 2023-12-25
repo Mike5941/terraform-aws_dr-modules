@@ -7,7 +7,6 @@ terraform {
     dynamodb_table = "terraform-wonsoong"
     encrypt        = true
   }
-
 }
 
 provider "aws" {
