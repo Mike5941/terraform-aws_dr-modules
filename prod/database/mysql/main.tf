@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "ap-northeast-2"
-}
-
 terraform {
   backend "s3" {
     bucket = "terraform-wonsoong"
@@ -13,23 +9,46 @@ terraform {
   }
 }
 
-module "prod_db_secrets" {
+provider "aws" {
+  region = "ap-northeast-2"
+  alias = "primary"
+}
+
+provider "aws" {
+  region = "ap-northeast-1"
+  alias = "secondary"
+}
+
+module "db_secrets" {
   source      = "../../../global/secrets"
   secret_name = "MyDatabaseSecret"
 }
 
-module "prod_db" {
+module "primary" {
   source = "../../../modules/database/mysql"
 
-  identifier_prefix    = "primary-zone"
-  engine_type          = "mysql"
-  volume_size          = 10
-  instance_class       = "db.t2.micro"
-  skip_final_snapshot  = true
-  db_name              = "PZN"
-  db_subnet_group_name = "db-subnet-group"
+  providers ={
+    aws = aws.primary
+  }
 
-  db_username = module.prod_db_secrets.db_credentials["username"]
-  db_password = module.prod_db_secrets.db_credentials["password"]
+  db_name              = "primary0731s"
+  db_subnet_group_name = "db-subnet-group"
+  vpc_id = data.aws_vpc.primary.id
+  backup_retention_period = 1
+
+  db_username = module.db_secrets.db_credentials["username"]
+  db_password = module.db_secrets.db_credentials["password"]
 }
 
+module "replica" {
+  source = "../../../modules/database/mysql"
+
+  providers = {
+    aws = aws.secondary
+  }
+
+  vpc_id = data.aws_vpc.secondary.id
+  db_subnet_group_name = "db-subnet-group"
+
+  replicate_source_db = module.primary.arn
+}

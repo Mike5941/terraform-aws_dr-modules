@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "terraform-wonsoong"
-    key    = "prod/vpc/redundant/terraform.tfstate"
+    key    = "prod/vpc/secondary/terraform.tfstate"
     region = "ap-northeast-2"
 
     dynamodb_table = "terraform-wonsoong"
@@ -26,7 +26,7 @@ module "redundant_zone" {
     aws = aws.tokyo
 
   }
-  project_name   = "WEB-Redun"
+  project_name   = "WEB-Secondary"
   vpc_cidr_block = "10.2.0.0/16"
   subnets = {
     Pub-1 = {

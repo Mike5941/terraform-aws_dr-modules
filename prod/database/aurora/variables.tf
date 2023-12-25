@@ -9,7 +9,13 @@ data "aws_vpc" "primary" {
 data "aws_vpc" "secondary" {
   provider = aws.secondary
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["WEB-Secondary-vpc"]
   }
 }
+
+variable "project_name" {
+  type = string
+  default = "WEB-Primary"
+}
+

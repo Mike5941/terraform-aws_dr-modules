@@ -25,3 +25,6 @@ terraform.rc
 .terraform.lock.hcl
 
 .idea/
+
+*.outputs.tf
+.outputs.tf.*

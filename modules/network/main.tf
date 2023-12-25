@@ -72,7 +72,6 @@ resource "aws_eip" "primary_eip" {
   }
 }
 
-
 resource "aws_nat_gateway" "primary_ngw" {
   count         = 2
   allocation_id = aws_eip.primary_eip[count.index].id

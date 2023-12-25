@@ -1,15 +1,14 @@
 output "address" {
-  value       = aws_db_instance.rds_mysql.address
+  value       = module.primary_db.endpoint
   description = "Connect to the database at this endpoint"
 }
 
 output "port" {
-  value       = aws_db_instance.rds_mysql.port
+  value       = module.primary_db.port
   description = "The port the database is listening on"
 }
 
 output "arn" {
-  value       = aws_db_instance.rds_mysql.arn
+  value       = module.primary_db.arn
   description = "The ARN of the database"
 }
-
