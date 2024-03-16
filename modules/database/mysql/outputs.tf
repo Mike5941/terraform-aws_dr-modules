@@ -17,3 +17,4 @@ output "name" {
   value       = aws_db_instance.rds_mysql.db_name
   description = "The name of the database"
 }
+

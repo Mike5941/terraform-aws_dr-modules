@@ -1,7 +1,13 @@
 output "ami_id" {
-  value = data.aws_ami.amazon_linux2.id
+  value = data.aws_ami.wordpress_ami.id
 }
 
-output "private_ip" {
-  value = aws_instance.web[*].private_ip
+output "alb_dns_name" {
+  value = aws_lb.wordpress.dns_name
 }
+
+
+output "web_sg_id" {
+  value = aws_security_group.web.id
+}
+

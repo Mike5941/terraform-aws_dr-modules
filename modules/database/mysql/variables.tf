@@ -1,26 +1,60 @@
+data "aws_ami" "amazon_linux2" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
+data "terraform_remote_state" "vpc" {
+  backend = "s3"
+  config = {
+    bucket = "terraform-wonsoong"
+    key    = var.vpc_remote_state_key
+    region = "ap-northeast-2"
+  }
+}
+
+#data "terraform_remote_state" "web" {
+#  backend = "s3"
+#  config = {
+#    bucket = "terraform-wonsoong"
+#    key = var.web_remote_state_key
+#    region = "ap-northeast-2"
+#  }
+#}
+#
+#variable "web_remote_state_key" {
+#  value = string
+#}
+
+variable "project_name" {
+  type    = string
+  default = "ha-web"
+}
+
 variable "db_name" {
-  type = string
+  type    = string
   default = null
 }
 
 variable "db_username" {
-  type = string
+  type      = string
   sensitive = true
-  default = null
+  default   = null
 }
 
 variable "db_password" {
-  type = string
+  type      = string
   sensitive = true
-  default = null
-}
-
-variable "vpc_remote_state_bucket" {
-  type = string
+  default   = null
 }
 
 variable "vpc_remote_state_key" {
-  type = string
+  type    = string
+  default = "stage/network/primary/terraform.tfstate"
 }
 
 variable "backup_retention_period" {
@@ -37,5 +71,5 @@ variable "replicate_source_db" {
 
 locals {
   seoul_region = "ap-northeast-2"
-  mysql_port = 3306
+  mysql_port   = 3306
 }

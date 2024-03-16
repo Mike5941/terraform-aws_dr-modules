@@ -1,10 +1,32 @@
-data "aws_ami" "amazon_linux2" {
+#data "aws_ami" "wordpress_ami" {
+#  most_recent = true
+#  owners      = ["amazon"]
+#
+#  filter {
+#    name   = "name"
+#    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+#  }
+#}
+
+
+data "aws_ami" "wordpress_ami" {
   most_recent = true
-  owners      = ["amazon"]
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+    values = ["wordpress-ami"]
+  }
+
+  owners = ["self"]
+}
+
+data "terraform_remote_state" "vpc" {
+  backend = "s3"
+
+  config = {
+    bucket = var.remote_state_bucket
+    key    = var.vpc_remote_state_key
+    region = "ap-northeast-2"
   }
 }
 
@@ -12,8 +34,13 @@ variable "cluster_name" {
   type = string
 }
 
-variable "remote_state_bucket" {
+variable "private_ip" {
   type = string
+}
+
+variable "remote_state_bucket" {
+  type    = string
+  default = "terraform-wonsoong"
 }
 
 variable "vpc_remote_state_key" {
@@ -21,13 +48,13 @@ variable "vpc_remote_state_key" {
 }
 
 variable "db_username" {
-  type = string
-  sensitive =true
+  type      = string
+  sensitive = true
 }
 
 variable "db_password" {
-  type = string
-  sensitive =true
+  type      = string
+  sensitive = true
 }
 
 variable "db_host" {
@@ -41,6 +68,38 @@ variable "db_port" {
 variable "db_name" {
   type = string
 }
+
+variable "min_size" {
+  type = number
+}
+
+variable "max_size" {
+  type = number
+}
+
+variable "listener_port" {
+  type = number
+  default = 80
+}
+
+variable "name" {
+  type = string
+  default = "wordpress"
+}
+
+variable "record_id" {
+  type = string
+}
+
+variable "route_policy_type" {
+  type = string
+}
+
+variable "health_check_id" {
+  type = string
+  default = null
+}
+
 
 locals {
   ssh_port    = 22
