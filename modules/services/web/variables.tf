@@ -1,24 +1,31 @@
-#data "aws_ami" "wordpress_ami" {
-#  most_recent = true
-#  owners      = ["amazon"]
-#
-#  filter {
-#    name   = "name"
-#    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-#  }
-#}
-
-
 data "aws_ami" "wordpress_ami" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["wordpress-ami"]
+    values = ["amzn2-ami-hvm-*-x86_64-ebs"]
   }
 
-  owners = ["self"]
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["137112412989"]
 }
+
+
+
+#data "aws_ami" "wordpress_ami" {
+#  most_recent = true
+#
+#  filter {
+#    name   = "name"
+#    values = ["wordpress-ami"]
+#  }
+#
+#  owners = ["self"]
+#}
 
 data "terraform_remote_state" "vpc" {
   backend = "s3"
@@ -111,7 +118,7 @@ locals {
 
   local_cidr    = ["10.0.0.0/8"]
   icmp_protocol = "icmp"
-  my_ip         = ["125.242.51.183/32"]
+  my_ip         = ["211.217.219.108/32"]
   any_port      = -1
   any_protocol  = "-1"
   all_ips       = ["0.0.0.0/0"]

@@ -54,7 +54,7 @@ variable "db_password" {
 
 variable "vpc_remote_state_key" {
   type    = string
-  default = "stage/network/primary/terraform.tfstate"
+  default = "prod/network/primary/terraform.tfstate"
 }
 
 variable "backup_retention_period" {

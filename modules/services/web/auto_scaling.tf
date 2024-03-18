@@ -4,13 +4,13 @@ resource "aws_launch_configuration" "wordpress" {
   security_groups = [aws_security_group.web.id]
   key_name = "wonsoong"
 
-#  user_data = base64encode(templatefile("${path.module}/user-data.sh", {
-#    db_name = var.db_name
-#    db_username = var.db_username
-#    db_password = var.db_password
-#    db_host  = var.db_host
-#    db_port     = var.db_port
-#  }))
+  user_data = base64encode(templatefile("${path.module}/user-data.sh", {
+    db_name = var.db_name
+    db_username = var.db_username
+    db_password = var.db_password
+    db_host  = var.db_host
+    db_port     = var.db_port
+  }))
 
 
   lifecycle {
