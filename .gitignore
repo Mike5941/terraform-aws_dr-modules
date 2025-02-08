@@ -31,3 +31,4 @@ terraform.rc
 .outputs.tf.*
 
 *.zip
+.DS_Store
